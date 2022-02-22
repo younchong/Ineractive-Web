@@ -1,5 +1,5 @@
-// drag해서 던지는 효과(o), 클릭 위치에서 공 생기기 (o)
-// 속력 더 빨라지는것 개선하기
+// q. mac os 에서 화면 전환시 브라우저 더 빨라지는 이유?
+// 마우스 속도에 따른 볼의 움직임 개선 필요
 const area = 2 * Math.PI;
 const radius = 20;
 
@@ -26,6 +26,7 @@ class Entity {
     this.velocity = velocity;
   }
 
+  
   update(delta: number) {}
 }
 
@@ -33,7 +34,7 @@ class Circle extends Entity {
   //velocity: Vector = new Vector(0, 0); // 여기서 속력 조절
 
   update(delta: number) {
-    this.velocity.x += this.velocity.x * 0.1 * delta; // 여기서 방향 + = 
+    this.velocity.x += this.velocity.x * 0.01 * delta; // 그나마 제일 자연스러운 듯 q. 값을 임의로 정하면서 구했는데, 정석은?
     this.velocity.y += 10 * delta; // gravity 
     this.position = this.position.add(this.velocity);
 
@@ -56,8 +57,9 @@ class Circle extends Entity {
 
 
   render(context: CanvasRenderingContext2D) {
+    const randomColor: string[] = ["red", "orange", "yellow", "green", "blue", "navy", "purple"]
     context.beginPath(); // make new path
-    context.fillStyle = "#000";
+    context.fillStyle = randomColor[Math.floor(Math.random() * 6)];
     context.arc(this.position.x, this.position.y, radius, 0, area); //make arc (x, y)원점 호를 그리므로 시작 각도와 끝 각도 => 원이니까 PI
     context.fill();
   }
@@ -117,10 +119,6 @@ window.addEventListener("load", () => {
   app = new App();
 });
 
-window.addEventListener("click", (e) => {
-  
-})
-
 let down: number[];
 let up: number[];
 window.addEventListener("mousedown", (e) => {
@@ -129,7 +127,7 @@ window.addEventListener("mousedown", (e) => {
 
 window.addEventListener("mouseup", (e) => {
   up = [e.x, e.y];
-  const differenceX = (up[0] - down[0]) * 0.01;
+  const differenceX = (up[0] - down[0]) * 0.01
   const differenceY = (up[1] - down[1]) * 0.01;
 
   if (e.x >= 0 && e.x <=1000 && e.y >= 0 && e.y <= 300) {
