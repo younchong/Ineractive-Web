@@ -1,7 +1,7 @@
 // q. mac os 에서 화면 전환시 브라우저 더 빨라지는 이유?
 // 마우스 속도에 따른 볼의 움직임 개선 필요
-const area = 2 * Math.PI;
-const radius = 20;
+const area: number = 2 * Math.PI;
+const radius: number = 20;
 
 class Vector {
   x: number;
