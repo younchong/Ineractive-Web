@@ -13,4 +13,4 @@
 * 마우스 이벤트로 클릭시 공 만들기
 * 마우스 드래그 길이에 비례하게 속력 만들기 (약간 아쉽다)
 
-<img src="Acceleration/bounce-ball.gif" />
+<img src="Acceleration/bounce-ball.gif">
