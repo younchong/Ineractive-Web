@@ -14,3 +14,8 @@
 * 마우스 드래그 길이에 비례하게 속력 만들기 (약간 아쉽다)
 
 <img src="./bounce-ball.gif">
+
+# 질문
+
+* Q. mac os 에서 화면 전환시 브라우저 더 빨라지는 이유?
+  * => requestAnimationFrame이 주사율 60hz 보장하진 않는다. background에서 제대로 작동하지 않느다.
