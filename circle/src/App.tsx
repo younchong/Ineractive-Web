@@ -11,15 +11,36 @@ class Vector {
   distance(other: Vector) {
     return Math.sqrt(Math.pow(this.x - other.x, 2) + Math.pow(this.y - other.y, 2));
   }
+
+  add(other: Vector) {
+    return new Vector(this.x + other.x, this.y + other.y);
+  }
 }
 
 class Circle {
   position: Vector;
   radius: number;
+  velocity: Vector;
 
-  constructor(position: Vector, radius: number) {
+  constructor(position: Vector, radius: number, velocity: Vector)  {
     this.position = position;
     this.radius = radius;
+    this.velocity = velocity;
+  }
+
+  update(delta: number) {
+    if (this.velocity.x && this.velocity.y) {
+      this.velocity.x += 5 * delta;
+      this.velocity.y += 10 * delta;
+      this.position = this.position.add(this.velocity);
+    }
+  }
+
+  render(context: CanvasRenderingContext2D) {
+    context.beginPath();
+    context.fillStyle = "rgb(0, 0, 0, 1)";
+    context.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2);
+    context.fill();
   }
 }
 
@@ -27,7 +48,8 @@ class Circle {
 export class App {
   canvas: HTMLCanvasElement;
   context: CanvasRenderingContext2D;
-
+  startTime: number;
+  delta: number;
   circles: Array<Circle> = [];
   mousePosition: Vector = new Vector(0, 0);
 
@@ -39,13 +61,15 @@ export class App {
 
     this.context = this.canvas.getContext("2d");
 
+    this.startTime = Date.now()
     this.circles = [
-      new Circle(new Vector(100, 100), 50),
-      new Circle(new Vector(200, 150), 20),
-      new Circle(new Vector(400, 150), 30)
+      new Circle(new Vector(100, 100), 50, new Vector(0, 0)),
+      new Circle(new Vector(200, 150), 20, new Vector(0, 0)),
+      new Circle(new Vector(400, 150), 30, new Vector(0, 0))
     ]
 
     this.canvas.addEventListener("mousemove", this.onMouseMove);
+    this.canvas.addEventListener("click", this.onMouseClick);
     this.render();
   }
 
@@ -64,11 +88,24 @@ export class App {
     }
   }
 
+  onMouseClick = (e: MouseEvent) => {
+    this.mousePosition = new Vector(e.clientX, e.clientY);
+    console.log(this.mousePosition)
+    this.circles.push(new Circle(new Vector(e.clientX, e.clientY), 25, new Vector(10, 10)));
+    this.render();
+  }
+
   render() {
-    this.circles.forEach(it => {
-      this.context.beginPath();
-      this.context.arc(it.position.x, it.position.y, it.radius, 0, Math.PI * 2.0);
-      this.context.fill();
+    const currentTime = Date.now();
+    this.delta = (currentTime - this.startTime) * 0.001;
+    this.startTime = currentTime;
+    window.requestAnimationFrame(this.render);
+
+    this.context.fillStyle = "rgba(255, 255, 255, 0.1)";
+    this.context.fillRect(0, 0, this.canvas.width, this.canvas.height)
+    this.circles.forEach(circle => {
+      circle.render(this.context);
+      circle.update(this.delta)
     })
   }
 }
