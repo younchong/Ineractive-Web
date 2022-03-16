@@ -29,11 +29,26 @@ class Circle {
   }
 
   update(delta: number) {
-    if (this.velocity.x && this.velocity.y) {
-      this.velocity.x += 5 * delta;
-      this.velocity.y += 10 * delta;
-      this.position = this.position.add(this.velocity);
+    if (!this.velocity.x && !this.velocity.y) return;
+    this.velocity.x += 1 * delta;
+    this.velocity.y += 1 * delta;
+    this.position = this.position.add(this.velocity);
+    if (this.position.y >= 500 - this.radius) {
+      this.position.y = 500 - this.radius;
+      this.velocity.y *= -1;
+    } else if (this.position.y <= 0 + this.radius) {
+      this.position.y = 0 + this.radius;
+      this.velocity.y *= -1;
     }
+
+    if (this.position.x >= 500 - this.radius) {
+      this.position.x = 500 - this.radius;
+      this.velocity.x *= -1;
+    } else if (this.position.x <= 0 + this.radius) {
+      this.position.x = 0 + this.radius;
+      this.velocity.x *= -1;
+    }
+
   }
 
   render(context: CanvasRenderingContext2D) {
@@ -48,29 +63,36 @@ class Circle {
 export class App {
   canvas: HTMLCanvasElement;
   context: CanvasRenderingContext2D;
+
   startTime: number;
-  delta: number;
+  delta: number = 0;
+
   circles: Array<Circle> = [];
+
   mousePosition: Vector = new Vector(0, 0);
 
   constructor() {
     this.canvas = document.createElement("canvas");
     this.canvas.width = 500;
     this.canvas.height = 500;
-    document.body.appendChild(this.canvas);
 
-    this.context = this.canvas.getContext("2d");
+    const context = this.canvas.getContext("2d");
+    if (!context) {
+      throw new Error("no context");
+    }
+    this.context = context;
 
     this.startTime = Date.now()
     this.circles = [
       new Circle(new Vector(100, 100), 50, new Vector(0, 0)),
-      new Circle(new Vector(200, 150), 20, new Vector(0, 0)),
-      new Circle(new Vector(400, 150), 30, new Vector(0, 0))
+      new Circle(new Vector(200, 150), 40, new Vector(0, 0)),
+      new Circle(new Vector(400, 150), 60, new Vector(0, 0))
     ]
 
+    document.body.appendChild(this.canvas);
     this.canvas.addEventListener("mousemove", this.onMouseMove);
     this.canvas.addEventListener("click", this.onMouseClick);
-    this.render();
+    window.requestAnimationFrame(this.render)
   }
 
   onMouseMove = (e: MouseEvent) => {
@@ -90,12 +112,11 @@ export class App {
 
   onMouseClick = (e: MouseEvent) => {
     this.mousePosition = new Vector(e.clientX, e.clientY);
-    console.log(this.mousePosition)
-    this.circles.push(new Circle(new Vector(e.clientX, e.clientY), 25, new Vector(10, 10)));
+    this.circles.push(new Circle(new Vector(e.clientX, e.clientY), 25, new Vector(5, 5)));
     this.render();
   }
 
-  render() {
+  render = () => {
     const currentTime = Date.now();
     this.delta = (currentTime - this.startTime) * 0.001;
     this.startTime = currentTime;
@@ -107,9 +128,25 @@ export class App {
       circle.render(this.context);
       circle.update(this.delta)
     })
+    if (this.circles.length > 3) {
+      for (let i = 3; i < this.circles.length; i++) {
+        const movingCircle = this.circles[i];
+        for (let i = 0; i < 3; i++) {
+          const circle = this.circles[i];
+          const distance = movingCircle.position.distance(circle.position);
+          if (distance + movingCircle.radius <= circle.radius) {
+            console.log("woops")
+            movingCircle.velocity.x *= -1;
+            movingCircle.velocity.y *= -1;
+            movingCircle.update(this.delta);
+          }
+        }
+      }
+    }
   }
 }
 export default App
 
 // 구현해볼 것
-// 새로 공 만들어서 부딪히기
+// [x] 새로 공 만들어서 부딪히기
+// 공의 radius에 따라 적용되기도하고 안되기도 한다. 고민해보자
