@@ -84,9 +84,9 @@ export class App {
 
     this.startTime = Date.now()
     this.circles = [
-      new Circle(new Vector(100, 100), 50, new Vector(0, 0)),
-      new Circle(new Vector(200, 150), 40, new Vector(0, 0)),
-      new Circle(new Vector(400, 150), 60, new Vector(0, 0))
+      new Circle(new Vector(100, 400), 50, new Vector(0, 0)),
+      new Circle(new Vector(200, 150), 20, new Vector(0, 0)),
+      new Circle(new Vector(400, 150), 30, new Vector(0, 0))
     ]
 
     document.body.appendChild(this.canvas);
@@ -128,25 +128,24 @@ export class App {
       circle.render(this.context);
       circle.update(this.delta)
     })
-    if (this.circles.length > 3) {
-      for (let i = 3; i < this.circles.length; i++) {
-        const movingCircle = this.circles[i];
-        for (let i = 0; i < 3; i++) {
-          const circle = this.circles[i];
-          const distance = movingCircle.position.distance(circle.position);
-          if (distance + movingCircle.radius <= circle.radius) {
-            console.log("woops")
-            movingCircle.velocity.x *= -1;
-            movingCircle.velocity.y *= -1;
-            movingCircle.update(this.delta);
+    this.circles.forEach((movingCircle, i) => {
+      if (movingCircle.velocity.x && movingCircle.velocity.y) {
+        this.circles.forEach((circle, idx) => {
+          if (i !== idx) {
+            const distance = movingCircle.position.distance(circle.position);
+            if (distance <= circle.radius + movingCircle.radius) {
+              movingCircle.velocity.x *= -1;
+              movingCircle.velocity.y *= -1;
+              movingCircle.update(this.delta);
+            }
           }
-        }
+        })
       }
-    }
+    }) //
   }
 }
 export default App
 
 // 구현해볼 것
 // [x] 새로 공 만들어서 부딪히기
-// 공의 radius에 따라 적용되기도하고 안되기도 한다. 고민해보자
+// 공끼리 부딪히기 구현
