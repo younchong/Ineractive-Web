@@ -145,7 +145,3 @@ export class App {
   }
 }
 export default App
-
-// 구현해볼 것
-// [x] 새로 공 만들어서 부딪히기
-// 공끼리 부딪히기 구현
